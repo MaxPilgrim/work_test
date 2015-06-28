@@ -99,13 +99,12 @@
 }
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     TableViewCell * cell = [tableView dequeueReusableCellWithIdentifier:CELL_IDENTIFIER];
-//TODO: implement [cell configureWithMan:[DATASOURCE people][indexPath.row]]
-    cell.textLabel.text = @"Name";
+    [cell configureCellWithMan:[DATASOURCE people][indexPath.row]];
     return cell;
 }
 #pragma mark - <UITableViewDelegate>
 -(void)tableView:(UITableView *)tableView didEndDisplayingCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath{
-//TODO: [(TableViewCell *)cell stopObserving];
+    [(TableViewCell *)cell stopObserving];
 }
 
 
@@ -147,7 +146,9 @@
 #pragma mark - DATASOURCE KVO
 -(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context{
     if ([keyPath isEqualToString:@"people"]){
-        [self configurePreloader];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self configurePreloader];
+        });
     }
 }
 

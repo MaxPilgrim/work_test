@@ -11,7 +11,6 @@
 #import "Man.h"
 
 @interface DataSource ()
-@property (nonatomic)     dispatch_queue_t serialQueue;
 @end
 
 @implementation DataSource
@@ -33,8 +32,8 @@
 
 
 -(void) initPeople{
-//    int delayInSeconds = arc4random() % 5;
-    int delayInSeconds = 0;
+    int delayInSeconds = arc4random() % 4 + 1;
+//    int delayInSeconds = 0;
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC)), _serialQueue, ^{
         NSMutableArray * people = [[NSMutableArray alloc] init];
         int size = arc4random() % 100;

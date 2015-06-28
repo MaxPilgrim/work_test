@@ -7,7 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
-
+#import "Man.h"
 @interface TableViewCell : UITableViewCell
+
+-(void) configureCellWithMan:(Man *)man;
+-(void) stopObserving;
 
 @end

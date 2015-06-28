@@ -24,7 +24,7 @@
 
 @property (nonatomic, assign) BOOL active;
 @property (nonatomic, strong, readonly) NSArray *people; // array of Man objects, KVO-compatible
-
+@property (nonatomic) dispatch_queue_t serialQueue;
 
 +(DataSource *)sharedInstance;
 
