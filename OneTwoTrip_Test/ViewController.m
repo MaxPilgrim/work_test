@@ -15,6 +15,7 @@
 @interface ViewController () <UITableViewDataSource, UITableViewDelegate>{
     UITableView * tableView;
     UIView *header;
+    UIActivityIndicatorView * preloader;
 }
 
 @end
@@ -25,6 +26,17 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     [self configureViews];
+    [self configureDataSource];
+
+}
+
+-(void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    [self configurePreloader];
+}
+-(void)viewWillDisappear:(BOOL)animated{
+    [DATASOURCE removeObserver:self forKeyPath:@"people"];
+    [super viewWillDisappear:animated];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -33,7 +45,7 @@
 }
 
 
--(void) configureViews{
+-(void)configureViews{
     //self.view
     self.view.backgroundColor = [UIColor whiteColor];
 
@@ -50,6 +62,27 @@
     //active button will be in header
     [self configureTableHeader];
 
+}
+
+-(void)configurePreloader{
+    if (!DATASOURCE.people || !DATASOURCE.active){
+        if (!preloader){
+            preloader = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+            preloader.center = self.view.center;
+            [self.view addSubview:preloader];
+        }
+        tableView.hidden = YES;
+        preloader.hidden = NO;
+        [preloader startAnimating];
+    }else{
+        if (preloader){
+            [preloader stopAnimating];
+            preloader.hidden = YES;
+        }
+        tableView.hidden = NO;
+        [tableView reloadData];
+
+    }
 }
 
 #pragma mark - <UITableViewDataSource>
@@ -102,5 +135,20 @@
 }
 -(void)activeButtonTapped{
     DATASOURCE.active = !DATASOURCE.active;
+    [self configurePreloader];
 }
+
+#pragma mark - DATASOURCE
+-(void)configureDataSource{
+    [DATASOURCE addObserver:self forKeyPath:@"people" options:NSKeyValueObservingOptionNew context:nil];
+    DATASOURCE.active = YES;
+}
+
+#pragma mark - DATASOURCE KVO
+-(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context{
+    if ([keyPath isEqualToString:@"people"]){
+        [self configurePreloader];
+    }
+}
+
 @end

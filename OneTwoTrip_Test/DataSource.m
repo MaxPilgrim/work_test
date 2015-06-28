@@ -41,7 +41,10 @@
         for (int i = 0; i < size; i++) {
             [people addObject:[[Man alloc] init]];
         }
+        [self willChangeValueForKey:@"people"];
         _people = [NSArray arrayWithArray:people];
+        [self didChangeValueForKey:@"people"];
+        NSLog(@"Data source configured");
     });
 }
 
