@@ -112,11 +112,13 @@
 -(void)configureTableHeader{
     header = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 60)];
     header.backgroundColor = [UIColor whiteColor];
+
     //adding title
-    UILabel * title = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 60, 30)];
-    title.center = header.center;
+    UILabel * title = [[UILabel alloc] init];
     title.textAlignment = NSTextAlignmentCenter;
     title.text = @"People";
+    [title sizeToFit];
+    title.center = header.center;
     [header addSubview:title];
 
     //configuring button
@@ -124,12 +126,11 @@
     [button setTitle:@"Activate" forState:UIControlStateNormal];
     [button sizeToFit];
     button.center = CGPointMake(self.view.bounds.size.width - 20 - button.frame.size.width / 2, header.center.y);
-
     [button addTarget:self action:@selector(activeButtonTapped) forControlEvents:UIControlEventTouchUpInside];
     [header addSubview:button];
 
-    [self.view addSubview:header];
 
+    [self.view addSubview:header];
     tableView.frame = CGRectMake(0, header.frame.size.height, tableView.frame.size.width, tableView.frame.size.height - header.frame.size.height);
 }
 -(void)activeButtonTapped{

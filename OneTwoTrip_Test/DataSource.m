@@ -32,8 +32,7 @@
 
 
 -(void) initPeople{
-    int delayInSeconds = arc4random() % 4 + 1;
-//    int delayInSeconds = 0;
+    double delayInSeconds = arc4random() % 4 + 1;
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC)), _serialQueue, ^{
         NSMutableArray * people = [[NSMutableArray alloc] init];
         int size = arc4random() % 100;
@@ -43,7 +42,7 @@
         [self willChangeValueForKey:@"people"];
         _people = [NSArray arrayWithArray:people];
         [self didChangeValueForKey:@"people"];
-        NSLog(@"Data source configured");
+//        NSLog(@"Data source configured");
     });
 }
 

@@ -5,6 +5,8 @@
 //  Created by Kotov Max on 28/06/15.
 //  Copyright (c) 2015 kotovmd. All rights reserved.
 //
+#define CELL_TEXT_ANIMATION_DURATION 0.4
+
 
 #import "TableViewCell.h"
 
@@ -37,7 +39,7 @@
     if (!_man.name ){
         if (!preloader){
             preloader = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-            preloader.center = self.center;
+            preloader.center = CGPointMake(20, self.center.y);
             [self addSubview:preloader];
         }
         self.textLabel.text = @"";
@@ -49,6 +51,10 @@
             preloader.hidden = YES;
         }
         self.textLabel.text = _man.name;
+        self.textLabel.alpha = 0;
+        [UIView animateWithDuration:CELL_TEXT_ANIMATION_DURATION animations:^{
+            self.textLabel.alpha = 1;
+        }];
     }
 }
 
