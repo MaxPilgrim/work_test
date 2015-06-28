@@ -11,7 +11,7 @@
 @implementation Man
 
 -(instancetype)init{
-    self = [self init];
+    self = [super init];
     if (self){
         //set name in serial queue in random time
         int delayInSeconds = arc4random() % 10;

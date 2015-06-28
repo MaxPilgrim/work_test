@@ -6,8 +6,6 @@
 //  Copyright (c) 2015 kotovmd. All rights reserved.
 //
 
-#define SERIAL_QUEUE_IDENTIFIER "data_source_serial_queue"
-#define DATASOURCE [DataSource sharedInstance]
 
 #import "DataSource.h"
 #import "Man.h"
@@ -35,13 +33,15 @@
 
 
 -(void) initPeople{
-    int delayInSeconds = arc4random() % 5;
+//    int delayInSeconds = arc4random() % 5;
+    int delayInSeconds = 0;
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC)), _serialQueue, ^{
         NSMutableArray * people = [[NSMutableArray alloc] init];
         int size = arc4random() % 100;
         for (int i = 0; i < size; i++) {
             [people addObject:[[Man alloc] init]];
         }
+        _people = [NSArray arrayWithArray:people];
     });
 }
 
