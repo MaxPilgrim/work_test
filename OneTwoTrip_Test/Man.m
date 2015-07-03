@@ -17,18 +17,15 @@
         //set name in serial queue in random time
         double delayInSeconds = arc4random() % 3 + 1;
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC)), DATASOURCE.serialQueue, ^{
-            [self initName];
+            self.name = @"Name";
         });
     }
     return self;
 
 }
 
--(void) initName{
-//    NSLog(@"name set");
-    [self willChangeValueForKey:@"name"];
-    _name = @"Name";
-    [self didChangeValueForKey:@"name"];
+-(void)setName:(NSString *)name{
+    _name = name;
 }
 
 @end

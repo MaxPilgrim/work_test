@@ -10,41 +10,111 @@
 #import "DataSource.h"
 #import "Man.h"
 
-@interface DataSource ()
+@interface DataSource (){
+    BOOL _active;
+    NSMutableArray * _people;
+    NSLock * _lockPeople;
+    NSLock * _lockActive;
+}
+
 @end
+
 
 @implementation DataSource
 
 #pragma mark - singltone
 
 +(DataSource *)sharedInstance {
-    static DataSource *singltone = nil;
+    static DataSource *singletone = nil;
     static dispatch_once_t once_t;
     dispatch_once(&once_t, ^
                   {
-                      singltone = [[DataSource alloc] init];
-                      singltone.serialQueue = dispatch_queue_create(SERIAL_QUEUE_IDENTIFIER, NULL);
-                      [singltone initPeople];
+                      singletone = [[DataSource alloc] init];
                   });
 
-    return singltone;
+    return singletone;
+}
+-(instancetype)init{
+    self = [super init];
+    if (self){
+        self.serialQueue = dispatch_queue_create(SERIAL_QUEUE_IDENTIFIER, NULL);
+        _people = [NSMutableArray new];
+        _lockPeople = [NSLock new];
+        _lockActive = [NSLock new];
+    }
+    return self;
+}
+
+#pragma mark - _people KVC
+
+-(void) insertObject:(Man *)object inPeopleAtIndex:(NSUInteger)index{
+    [_lockPeople lock];
+    [_people insertObject:object atIndex:index];
+    [_lockPeople unlock];
+}
+-(void)removeObjectFromPeopleAtIndex:(NSUInteger)index{
+    [_lockPeople lock];
+    [_people removeObjectAtIndex:index];
+    [_lockPeople unlock];
+}
+
+-(NSArray * )people{
+    NSArray * people;
+    [_lockPeople lock];
+    people = _people;
+    [_lockPeople unlock];
+    return _people;
 }
 
 
--(void) initPeople{
-    double delayInSeconds = arc4random() % 4 + 1;
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC)), _serialQueue, ^{
-        NSMutableArray * people = [[NSMutableArray alloc] init];
-        int size = arc4random() % 100;
-        for (int i = 0; i < size; i++) {
-            [people addObject:[[Man alloc] init]];
-        }
-        [self willChangeValueForKey:@"people"];
-        _people = [NSArray arrayWithArray:people];
-        [self didChangeValueForKey:@"people"];
-//        NSLog(@"Data source configured");
-    });
+#pragma mark - _active KVC
+-(BOOL)active{
+    BOOL acitve;
+
+    [_lockActive lock];
+    acitve = _active;
+    [_lockActive unlock];
+
+    return acitve;
 }
 
+-(void)setActive:(BOOL)active{
+    [_lockActive lock];
+    if (_active != active)  {
+        _active = active;
+    }
+    [_lockActive unlock];
+    [self startUpdates];
+}
+
+#pragma mark - updates methods
+
+-(void)performUpdate{
+    if (!self.active) return;
+    BOOL isInsert = ((arc4random() % 10) > 3) || _people.count == 0;
+    int idx = arc4random() % (_people.count + (int)isInsert);
+    if (isInsert){
+        Man * man = [Man new];
+        [self insertObject:man inPeopleAtIndex:idx];
+    }else{
+        [self removeObjectFromPeopleAtIndex:idx];
+    }
+}
+
+-(void)nextUpdate{
+    if (self.active){
+        double delay = (arc4random() % 10) / 10.0 + 0.4;
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), _serialQueue, ^{
+            [self performUpdate];
+            dispatch_async(_serialQueue, ^{
+                [self nextUpdate];
+            });
+            
+        });
+    }
+}
+-(void)startUpdates{
+    [self nextUpdate];
+}
 
 @end

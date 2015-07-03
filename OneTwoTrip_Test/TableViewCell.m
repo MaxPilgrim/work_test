@@ -12,15 +12,27 @@
 
 @interface TableViewCell(){
     UIActivityIndicatorView * preloader;
-    Man * _man;
 }
-
+@property (nonatomic, strong) Man * man;
 @end
 
 @implementation TableViewCell
 
 - (void)awakeFromNib {
     // Initialization code
+    [super awakeFromNib];
+
+}
+-(instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier{
+    self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
+    if (self){
+        [self addObserver:self forKeyPath:@"man.name" options:0 context:NULL];
+    }
+    return self;
+}
+
+-(void)dealloc{
+    [self removeObserver:self forKeyPath:@"man.name"];
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
@@ -29,9 +41,12 @@
     // Configure the view for the selected state
 }
 
--(void)configureCellWithMan:(Man *)man{
+-(void)setMan:(Man *)man{
     _man = man;
-    [man addObserver:self forKeyPath:@"name" options:NSKeyValueObservingOptionNew context:nil];
+}
+
+-(void)configureCellWithMan:(Man *)man{
+    self.man = man;
     [self configurePreloader];
 }
 
@@ -58,13 +73,9 @@
     }
 }
 
--(void)stopObserving{
-    [_man removeObserver:self forKeyPath:@"name"];
-}
-
 #pragma mark - Man KVO
 -(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context{
-    if ([keyPath isEqualToString:@"name"]){
+    if ([keyPath isEqualToString:@"man.name"]){
         dispatch_async(dispatch_get_main_queue(), ^{
             [self configurePreloader];
         });

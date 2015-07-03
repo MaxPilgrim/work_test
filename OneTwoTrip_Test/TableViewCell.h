@@ -11,6 +11,5 @@
 @interface TableViewCell : UITableViewCell
 
 -(void) configureCellWithMan:(Man *)man;
--(void) stopObserving;
 
 @end

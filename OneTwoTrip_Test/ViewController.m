@@ -65,23 +65,12 @@
 }
 
 -(void)configurePreloader{
-    if (!DATASOURCE.people || !DATASOURCE.active){
-        if (!preloader){
-            preloader = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-            preloader.center = self.view.center;
-            [self.view addSubview:preloader];
-        }
-        tableView.hidden = YES;
+    if (DATASOURCE.active){
         preloader.hidden = NO;
         [preloader startAnimating];
     }else{
-        if (preloader){
-            [preloader stopAnimating];
-            preloader.hidden = YES;
-        }
-        tableView.hidden = NO;
-        [tableView reloadData];
-
+        [preloader stopAnimating];
+        preloader.hidden = YES;
     }
 }
 
@@ -103,9 +92,6 @@
     return cell;
 }
 #pragma mark - <UITableViewDelegate>
--(void)tableView:(UITableView *)tableView didEndDisplayingCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath{
-    [(TableViewCell *)cell stopObserving];
-}
 
 
 #pragma mark - Active Button
@@ -130,6 +116,13 @@
     [header addSubview:button];
 
 
+    preloader = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    preloader.center = CGPointMake(20, header.center.y);
+    [header addSubview:preloader];
+
+
+
+
     [self.view addSubview:header];
     tableView.frame = CGRectMake(0, header.frame.size.height, tableView.frame.size.width, tableView.frame.size.height - header.frame.size.height);
 }
@@ -145,11 +138,36 @@
 }
 
 #pragma mark - DATASOURCE KVO
+
 -(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context{
     if ([keyPath isEqualToString:@"people"]){
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self configurePreloader];
-        });
+        if ([[change objectForKey:NSKeyValueChangeKindKey] unsignedIntegerValue] == NSKeyValueChangeInsertion){
+            NSIndexSet * indexSet = [change objectForKey:NSKeyValueChangeIndexesKey];
+            NSMutableArray * indexPaths = [NSMutableArray new];
+            [indexSet enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+                [indexPaths addObject:[NSIndexPath indexPathForRow:idx inSection:0]];
+            }];
+            dispatch_async(dispatch_get_main_queue(), ^{
+
+                [tableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationAutomatic];
+                [self configurePreloader];
+            });
+        }
+        if ([[change objectForKey:NSKeyValueChangeKindKey] unsignedIntegerValue] == NSKeyValueChangeRemoval){
+            NSIndexSet * indexSet = [change objectForKey:NSKeyValueChangeIndexesKey];
+            NSMutableArray * indexPaths = [NSMutableArray new];
+            [indexSet enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+                [indexPaths addObject:[NSIndexPath indexPathForRow:idx inSection:0]];
+            }];
+            NSLog(@"deleting at index = %d",[(NSIndexPath *)indexPaths[0] row]);
+            dispatch_async(dispatch_get_main_queue(), ^{
+
+                [tableView deleteRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationAutomatic];
+                [self configurePreloader];
+            });
+        }
+    
+        
     }
 }
 
