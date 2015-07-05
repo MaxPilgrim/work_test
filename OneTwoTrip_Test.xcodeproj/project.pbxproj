@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		711B3DC41B497BCA001EB799 /* ViewModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 711B3DC31B497BCA001EB799 /* ViewModel.m */; };
+		711B3DC91B49853C001EB799 /* QueuesManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 711B3DC81B49853C001EB799 /* QueuesManager.m */; };
 		71F3EFDC1B3FC6F200F40C6A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 71F3EFDB1B3FC6F200F40C6A /* main.m */; };
 		71F3EFDF1B3FC6F200F40C6A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 71F3EFDE1B3FC6F200F40C6A /* AppDelegate.m */; };
 		71F3EFE21B3FC6F200F40C6A /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 71F3EFE11B3FC6F200F40C6A /* ViewController.m */; };
@@ -30,6 +32,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		711B3DC21B497BCA001EB799 /* ViewModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewModel.h; sourceTree = "<group>"; };
+		711B3DC31B497BCA001EB799 /* ViewModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViewModel.m; sourceTree = "<group>"; };
+		711B3DC71B49853C001EB799 /* QueuesManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QueuesManager.h; sourceTree = "<group>"; };
+		711B3DC81B49853C001EB799 /* QueuesManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QueuesManager.m; sourceTree = "<group>"; };
 		71F3EFD61B3FC6F200F40C6A /* OneTwoTrip_Test.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OneTwoTrip_Test.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		71F3EFDA1B3FC6F200F40C6A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		71F3EFDB1B3FC6F200F40C6A /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -69,6 +75,26 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		711B3DC51B497BE5001EB799 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				71F3EFE01B3FC6F200F40C6A /* ViewController.h */,
+				71F3EFE11B3FC6F200F40C6A /* ViewController.m */,
+				71F3F0081B3FD1B200F40C6A /* TableViewCell.h */,
+				71F3F0091B3FD1B200F40C6A /* TableViewCell.m */,
+			);
+			name = View;
+			sourceTree = "<group>";
+		};
+		711B3DC61B497BED001EB799 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				711B3DC21B497BCA001EB799 /* ViewModel.h */,
+				711B3DC31B497BCA001EB799 /* ViewModel.m */,
+			);
+			name = ViewModel;
+			sourceTree = "<group>";
+		};
 		71F3EFCD1B3FC6F200F40C6A = {
 			isa = PBXGroup;
 			children = (
@@ -93,10 +119,8 @@
 				71F3EFFF1B3FC71200F40C6A /* Model */,
 				71F3EFDD1B3FC6F200F40C6A /* AppDelegate.h */,
 				71F3EFDE1B3FC6F200F40C6A /* AppDelegate.m */,
-				71F3EFE01B3FC6F200F40C6A /* ViewController.h */,
-				71F3EFE11B3FC6F200F40C6A /* ViewController.m */,
-				71F3F0081B3FD1B200F40C6A /* TableViewCell.h */,
-				71F3F0091B3FD1B200F40C6A /* TableViewCell.m */,
+				711B3DC61B497BED001EB799 /* ViewModel */,
+				711B3DC51B497BE5001EB799 /* View */,
 				71F3EFE61B3FC6F200F40C6A /* Images.xcassets */,
 				71F3F0061B3FCFCA00F40C6A /* Main.storyboard */,
 				71F3EFE81B3FC6F200F40C6A /* LaunchScreen.xib */,
@@ -138,6 +162,8 @@
 				71F3F0011B3FC72B00F40C6A /* Man.m */,
 				71F3F0031B3FCA9000F40C6A /* DataSource.h */,
 				71F3F0041B3FCA9000F40C6A /* DataSource.m */,
+				711B3DC71B49853C001EB799 /* QueuesManager.h */,
+				711B3DC81B49853C001EB799 /* QueuesManager.m */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -247,7 +273,9 @@
 				71F3F0051B3FCA9000F40C6A /* DataSource.m in Sources */,
 				71F3EFE21B3FC6F200F40C6A /* ViewController.m in Sources */,
 				71F3EFDF1B3FC6F200F40C6A /* AppDelegate.m in Sources */,
+				711B3DC91B49853C001EB799 /* QueuesManager.m in Sources */,
 				71F3EFDC1B3FC6F200F40C6A /* main.m in Sources */,
+				711B3DC41B497BCA001EB799 /* ViewModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -436,6 +464,7 @@
 				71F3EFFB1B3FC6F200F40C6A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		71F3EFFC1B3FC6F200F40C6A /* Build configuration list for PBXNativeTarget "OneTwoTrip_TestTests" */ = {
 			isa = XCConfigurationList;
@@ -444,6 +473,7 @@
 				71F3EFFE1B3FC6F200F40C6A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

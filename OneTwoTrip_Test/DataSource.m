@@ -9,12 +9,11 @@
 
 #import "DataSource.h"
 #import "Man.h"
+#import "QueuesManager.h"
 
 @interface DataSource (){
     BOOL _active;
     NSMutableArray * _people;
-    NSLock * _lockPeople;
-    NSLock * _lockActive;
 }
 
 @end
@@ -22,25 +21,10 @@
 
 @implementation DataSource
 
-#pragma mark - singltone
-
-+(DataSource *)sharedInstance {
-    static DataSource *singletone = nil;
-    static dispatch_once_t once_t;
-    dispatch_once(&once_t, ^
-                  {
-                      singletone = [[DataSource alloc] init];
-                  });
-
-    return singletone;
-}
 -(instancetype)init{
     self = [super init];
     if (self){
-        self.serialQueue = dispatch_queue_create(SERIAL_QUEUE_IDENTIFIER, NULL);
         _people = [NSMutableArray new];
-        _lockPeople = [NSLock new];
-        _lockActive = [NSLock new];
     }
     return self;
 }
@@ -48,42 +32,44 @@
 #pragma mark - _people KVC
 
 -(void) insertObject:(Man *)object inPeopleAtIndex:(NSUInteger)index{
-    [_lockPeople lock];
     [_people insertObject:object atIndex:index];
-    [_lockPeople unlock];
 }
+
+-(void)insertPeople:(NSArray *)array atIndexes:(NSIndexSet *)indexes{
+    [_people insertObjects:array atIndexes:indexes];
+}
+
 -(void)removeObjectFromPeopleAtIndex:(NSUInteger)index{
-    [_lockPeople lock];
     [_people removeObjectAtIndex:index];
-    [_lockPeople unlock];
+}
+-(void)removePeopleAtIndexes:(NSIndexSet *)indexes{
+    [_people removeObjectsAtIndexes:indexes];
+}
+
+-(void)replaceObjectInPeopleAtIndex:(NSUInteger)index withObject:(id)object{
+    [_people replaceObjectAtIndex:index withObject:object];
+}
+-(void)replacePeopleAtIndexes:(NSIndexSet *)indexes withPeople:(NSArray *)array{
+    [_people replaceObjectsAtIndexes:indexes withObjects:array];
 }
 
 -(NSArray * )people{
-    NSArray * people;
-    [_lockPeople lock];
-    people = _people;
-    [_lockPeople unlock];
     return _people;
 }
 
+-(void)setPeople:(NSArray *)people{
+    _people = [NSMutableArray arrayWithArray:people];
+}
 
 #pragma mark - _active KVC
 -(BOOL)active{
-    BOOL acitve;
-
-    [_lockActive lock];
-    acitve = _active;
-    [_lockActive unlock];
-
-    return acitve;
+    return _active;
 }
 
 -(void)setActive:(BOOL)active{
-    [_lockActive lock];
     if (_active != active)  {
         _active = active;
     }
-    [_lockActive unlock];
     [self startUpdates];
 }
 
@@ -103,10 +89,10 @@
 
 -(void)nextUpdate{
     if (self.active){
-        double delay = (arc4random() % 10) / 10.0 + 0.4;
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), _serialQueue, ^{
+        double delay = (arc4random() % 100) / 100.0 + 0.2;
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), QUEQUES_MANAGER.serialQueue, ^{
             [self performUpdate];
-            dispatch_async(_serialQueue, ^{
+            dispatch_async(QUEQUES_MANAGER.serialQueue, ^{
                 [self nextUpdate];
             });
             

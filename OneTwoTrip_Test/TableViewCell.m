@@ -50,6 +50,7 @@
     [self configurePreloader];
 }
 
+
 -(void)configurePreloader{
     if (!_man.name ){
         if (!preloader){

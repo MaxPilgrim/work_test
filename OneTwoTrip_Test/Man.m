@@ -7,7 +7,7 @@
 //
 
 #import "Man.h"
-#import "DataSource.h"
+#import "QueuesManager.h"
 
 @implementation Man
 
@@ -16,7 +16,7 @@
     if (self){
         //set name in serial queue in random time
         double delayInSeconds = arc4random() % 3 + 1;
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC)), DATASOURCE.serialQueue, ^{
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC)), QUEQUES_MANAGER.serialQueue, ^{
             self.name = @"Name";
         });
     }

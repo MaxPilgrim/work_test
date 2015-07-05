@@ -9,24 +9,35 @@
 #define CELL_IDENTIFIER @"cell_identifier"
 
 #import "ViewController.h"
-#import "DataSource.h"
+#import "ViewModel.h"
 #import "TableViewCell.h"
 
-@interface ViewController () <UITableViewDataSource, UITableViewDelegate>{
+@interface ViewController () <UITableViewDataSource, UITableViewDelegate, ViewModelDelegate>{
     UITableView * tableView;
     UIView *header;
     UIActivityIndicatorView * preloader;
+    ViewModel * _viewModel;
+    NSLock * _lockDataSource;
 }
 
 @end
 
 @implementation ViewController
 
+
+-(instancetype)init{
+    self = [super init];
+    if (self) {
+        _viewModel = [[ViewModel alloc] initWithDataSource:[[DataSource alloc] init]];
+        _viewModel.delegate = self;
+    }
+    return self;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     [self configureViews];
-    [self configureDataSource];
 
 }
 
@@ -35,7 +46,6 @@
     [self configurePreloader];
 }
 -(void)viewWillDisappear:(BOOL)animated{
-    [DATASOURCE removeObserver:self forKeyPath:@"people"];
     [super viewWillDisappear:animated];
 }
 
@@ -65,7 +75,7 @@
 }
 
 -(void)configurePreloader{
-    if (DATASOURCE.active){
+    if (_viewModel.active){
         preloader.hidden = NO;
         [preloader startAnimating];
     }else{
@@ -80,15 +90,11 @@
 }
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    if ([DATASOURCE people]){
-        return [[DATASOURCE people] count];
-    }else{
-        return 0;
-    }
+    return _viewModel.people ? _viewModel.people.count : 0;
 }
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     TableViewCell * cell = [tableView dequeueReusableCellWithIdentifier:CELL_IDENTIFIER];
-    [cell configureCellWithMan:[DATASOURCE people][indexPath.row]];
+    [cell configureCellWithMan:_viewModel.people[indexPath.row]];
     return cell;
 }
 #pragma mark - <UITableViewDelegate>
@@ -121,54 +127,29 @@
     [header addSubview:preloader];
 
 
-
-
     [self.view addSubview:header];
     tableView.frame = CGRectMake(0, header.frame.size.height, tableView.frame.size.width, tableView.frame.size.height - header.frame.size.height);
 }
 -(void)activeButtonTapped{
-    DATASOURCE.active = !DATASOURCE.active;
+    _viewModel.active = !_viewModel.active;
     [self configurePreloader];
 }
 
-#pragma mark - DATASOURCE
--(void)configureDataSource{
-    [DATASOURCE addObserver:self forKeyPath:@"people" options:NSKeyValueObservingOptionNew context:nil];
-    DATASOURCE.active = YES;
+
+
+#pragma mark - <ViewModelDelegate>
+-(void)didSetData{
+    [tableView reloadData];
+}
+-(void)didInsertedObjectsAtIndexPaths:(NSArray *)indexPaths{
+    [tableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationAutomatic];
+}
+-(void)didRemovedObjectsAtIndexPaths:(NSArray *)indexPaths{
+    [tableView deleteRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationAutomatic];
+}
+-(void)didReplacedObjectsAtIndexPaths:(NSArray *)indexPaths{
+    [tableView reloadRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationAutomatic];
 }
 
-#pragma mark - DATASOURCE KVO
-
--(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context{
-    if ([keyPath isEqualToString:@"people"]){
-        if ([[change objectForKey:NSKeyValueChangeKindKey] unsignedIntegerValue] == NSKeyValueChangeInsertion){
-            NSIndexSet * indexSet = [change objectForKey:NSKeyValueChangeIndexesKey];
-            NSMutableArray * indexPaths = [NSMutableArray new];
-            [indexSet enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
-                [indexPaths addObject:[NSIndexPath indexPathForRow:idx inSection:0]];
-            }];
-            dispatch_async(dispatch_get_main_queue(), ^{
-
-                [tableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationAutomatic];
-                [self configurePreloader];
-            });
-        }
-        if ([[change objectForKey:NSKeyValueChangeKindKey] unsignedIntegerValue] == NSKeyValueChangeRemoval){
-            NSIndexSet * indexSet = [change objectForKey:NSKeyValueChangeIndexesKey];
-            NSMutableArray * indexPaths = [NSMutableArray new];
-            [indexSet enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
-                [indexPaths addObject:[NSIndexPath indexPathForRow:idx inSection:0]];
-            }];
-            NSLog(@"deleting at index = %d",[(NSIndexPath *)indexPaths[0] row]);
-            dispatch_async(dispatch_get_main_queue(), ^{
-
-                [tableView deleteRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationAutomatic];
-                [self configurePreloader];
-            });
-        }
-    
-        
-    }
-}
 
 @end
