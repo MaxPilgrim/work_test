@@ -94,11 +94,16 @@
 }
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     TableViewCell * cell = [tableView dequeueReusableCellWithIdentifier:CELL_IDENTIFIER];
-    [cell configureCellWithMan:_viewModel.people[indexPath.row]];
+    [cell configureCellWithMan:[_viewModel.people objectAtIndex:indexPath.row]];
     return cell;
 }
 #pragma mark - <UITableViewDelegate>
-
+-(CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath{
+    return 44;
+}
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
+    return 44;
+}
 
 #pragma mark - Active Button
 -(void)configureTableHeader{
@@ -139,16 +144,16 @@
 
 #pragma mark - <ViewModelDelegate>
 -(void)didSetData{
-    [tableView reloadData];
+    [tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationTop];
 }
 -(void)didInsertedObjectsAtIndexPaths:(NSArray *)indexPaths{
-    [tableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationAutomatic];
+    [tableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationTop];
 }
 -(void)didRemovedObjectsAtIndexPaths:(NSArray *)indexPaths{
-    [tableView deleteRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationAutomatic];
+    [tableView deleteRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationTop];
 }
 -(void)didReplacedObjectsAtIndexPaths:(NSArray *)indexPaths{
-    [tableView reloadRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationAutomatic];
+    [tableView reloadRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationTop];
 }
 
 

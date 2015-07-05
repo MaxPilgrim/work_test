@@ -35,6 +35,7 @@
     [self removeObserver:self forKeyPath:@"man.name"];
 }
 
+
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
     [super setSelected:selected animated:animated];
 
@@ -53,14 +54,7 @@
 
 -(void)configurePreloader{
     if (!_man.name ){
-        if (!preloader){
-            preloader = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-            preloader.center = CGPointMake(20, self.center.y);
-            [self addSubview:preloader];
-        }
-        self.textLabel.text = @"";
-        preloader.hidden = NO;
-        [preloader startAnimating];
+        [self setPreloaderActive];
     }else{
         if (preloader){
             [preloader stopAnimating];
@@ -72,6 +66,17 @@
             self.textLabel.alpha = 1;
         }];
     }
+}
+
+-(void)setPreloaderActive{
+    if (!preloader){
+        preloader = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+        preloader.center = CGPointMake(20, self.center.y);
+        [self addSubview:preloader];
+    }
+    self.textLabel.text = @"";
+    preloader.hidden = NO;
+    [preloader startAnimating];
 }
 
 #pragma mark - Man KVO
