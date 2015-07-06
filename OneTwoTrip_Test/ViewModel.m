@@ -43,6 +43,10 @@
     }
 }
 
+-(NSString *)nameAtIndex:(NSUInteger)index{
+    NSString * name = [_people[index] isKindOfClass:[NSNull class]] ? nil : _people[index];
+    return name;
+}
 
 #pragma mark - DATASOURCE KVO
 

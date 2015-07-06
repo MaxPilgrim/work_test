@@ -20,7 +20,7 @@
 
 
 -(instancetype)initWithDataSource:(id<DataSource>)dataSource;
-
+-(NSString *)nameAtIndex:(NSUInteger)index;
 @end
 
 @protocol ViewModelDelegate <NSObject>

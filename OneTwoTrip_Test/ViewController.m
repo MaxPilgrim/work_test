@@ -108,7 +108,7 @@
 }
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     TableViewCell * cell = [_tableView dequeueReusableCellWithIdentifier:CELL_IDENTIFIER];
-    [cell configureCellWithName:_viewModel.people[indexPath.row]];
+    [cell configureCellWithName:[_viewModel nameAtIndex:indexPath.row]];
     return cell;
 }
 #pragma mark - <UITableViewDelegate>
@@ -140,7 +140,7 @@
     NSArray * indexPaths = [self getIndexPathsFromIndexSet:indexes];
     [_tableView reloadRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationTop];
 }
-
+    
 
 -(NSArray *) getIndexPathsFromIndexSet:(NSIndexSet *) set{
     NSMutableArray * indexPaths = [NSMutableArray new];

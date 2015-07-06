@@ -20,7 +20,7 @@
 
 
 -(void)configureCellWithName:(NSString *)name{
-    if (!name || name == (id)[NSNull null]){
+    if (!name){
         if (!preloader){
             preloader = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
             preloader.center = CGPointMake(20, self.center.y);
