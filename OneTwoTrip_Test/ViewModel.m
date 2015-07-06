@@ -32,7 +32,12 @@
 }
 
 -(void)dealloc{
+    _dataSource.active = NO;
     [_dataSource removeObserver:self forKeyPath:@"people"];
+    [_dataSource.people enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        Man * man = (Man *)obj;
+        [man removeObserver:self forKeyPath:@"name"];
+    }];
 }
 
 
@@ -100,10 +105,12 @@
     if ([keyPath isEqualToString:@"name"]){
         NSUInteger idx = [_dataSource.people indexOfObject:object];
         id name = [change objectForKey:NSKeyValueChangeNewKey];
-        if (idx != NSNotFound && self.delegate){
+        if (idx != NSNotFound){
             dispatch_async(dispatch_get_main_queue(), ^{
-                _people[idx] = name;
-                [self.delegate viewModel:self didReplaceObjectsAtIndexes:[NSIndexSet indexSetWithIndex:idx]];
+                if (self.delegate){
+                    _people[idx] = name;
+                    [self.delegate viewModel:self didReplaceObjectsAtIndexes:[NSIndexSet indexSetWithIndex:idx]];
+                }
             });
         }
         
