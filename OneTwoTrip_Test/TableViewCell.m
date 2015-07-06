@@ -9,38 +9,26 @@
 
 
 #import "TableViewCell.h"
-#import "Man.h"
 
 @interface TableViewCell(){
     UIActivityIndicatorView * preloader;
 }
-@property (nonatomic, strong) Man * man;
+
 @end
 
 @implementation TableViewCell
 
--(instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier{
-    self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
-    if (self){
-        [self addObserver:self forKeyPath:@"man.name" options:NSKeyValueObservingOptionNew context:NULL];
-    }
-    return self;
-}
 
--(void)dealloc{
-    [self removeObserver:self forKeyPath:@"man.name"];
-}
-
-
--(void)configureCellWithMan:(Man *)man{
-    self.man = man;
-    [self configurePreloaderWithName:nil];
-}
-
-
--(void)configurePreloaderWithName:(NSString *)name{
-    if (!name){
-        [self setPreloaderActive];
+-(void)configureCellWithName:(NSString *)name{
+    if (!name || name == (id)[NSNull null]){
+        if (!preloader){
+            preloader = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+            preloader.center = CGPointMake(20, self.center.y);
+            [self addSubview:preloader];
+        }
+        self.textLabel.text = @"";
+        preloader.hidden = NO;
+        [preloader startAnimating];
     }else{
         if (preloader){
             [preloader stopAnimating];
@@ -52,30 +40,6 @@
             self.textLabel.alpha = 1;
         }];
     }
-}
-
--(void)setPreloaderActive{
-    if (!preloader){
-        preloader = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-        preloader.center = CGPointMake(20, self.center.y);
-        [self addSubview:preloader];
-    }
-    self.textLabel.text = @"";
-    preloader.hidden = NO;
-    [preloader startAnimating];
-}
-
-#pragma mark - Man KVO
--(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if ([keyPath isEqualToString:@"man.name"]){
-            id name = [change objectForKey:NSKeyValueChangeNewKey];
-            if ([name isKindOfClass:[NSNull class]]) name = nil;
-            [self configurePreloaderWithName:name];
-
-        }
-
-    });
 }
 
 

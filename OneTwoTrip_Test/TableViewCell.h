@@ -8,10 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
-@class Man;
-
 @interface TableViewCell : UITableViewCell
 
--(void) configureCellWithMan:(Man *)man;
+-(void)configureCellWithName:(NSString *)name;
 
 @end

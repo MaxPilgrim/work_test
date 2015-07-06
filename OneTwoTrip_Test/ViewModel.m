@@ -8,6 +8,7 @@
 
 #import "ViewModel.h"
 #import "DataSource.h"
+#import "Man.h"
 
 @interface ViewModel (){
     BOOL _active;
@@ -25,7 +26,7 @@
     if (self){
         _people = [NSMutableArray new];
         _dataSource = dataSource;
-        [_dataSource addObserver:self forKeyPath:@"people" options:NSKeyValueObservingOptionNew context:nil];
+        [_dataSource addObserver:self forKeyPath:@"people" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:nil];
     }
     return self;
 }
@@ -46,19 +47,33 @@
 #pragma mark - DATASOURCE KVO
 
 -(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context{
+
     if ([keyPath isEqualToString:@"people"]){
+        //Man KVO updating
+        NSArray * newObjects = [change objectForKey:NSKeyValueChangeNewKey];
+        NSMutableArray * newNames = [NSMutableArray new];
+        [newObjects enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+            Man * man = (Man *)obj;
+            [man addObserver:self forKeyPath:@"name" options:NSKeyValueObservingOptionNew context:NULL];
+            [newNames addObject:man.name ? man.name : [NSNull null]];
+        }];
+        NSArray * oldObjects = [change objectForKey:NSKeyValueChangeOldKey];
+        [oldObjects enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+            Man * man = (Man *)obj;
+            [man removeObserver:self forKeyPath:@"name"];
+        }];
+
         dispatch_async(dispatch_get_main_queue(), ^{
             if (self.delegate){
-                NSArray * newObjects = [change objectForKey:NSKeyValueChangeNewKey];
                 NSIndexSet * indexes = [change objectForKey:NSKeyValueChangeIndexesKey];
 
                 switch ([[change objectForKey:NSKeyValueChangeKindKey] unsignedIntegerValue]) {
                     case NSKeyValueChangeSetting:
-                        _people = [NSMutableArray arrayWithArray:newObjects];
+                        _people = [NSMutableArray arrayWithArray:newNames];
                         [self.delegate viewModelDidSetData:self];
                         break;
                     case NSKeyValueChangeInsertion:
-                        [_people insertObjects:newObjects atIndexes:indexes];
+                        [_people insertObjects:newNames atIndexes:indexes];
                         [self.delegate viewModel:self didInsertObjectsAtIndexes:indexes];
                         break;
                     case NSKeyValueChangeRemoval:
@@ -66,7 +81,7 @@
                         [self.delegate viewModel:self didRemoveObjectsAtIndexes:indexes];
                         break;
                     case NSKeyValueChangeReplacement:
-                        [_people replaceObjectsAtIndexes:indexes withObjects:newObjects];
+                        [_people replaceObjectsAtIndexes:indexes withObjects:newNames];
                         [self.delegate viewModel:self didReplaceObjectsAtIndexes:indexes];
                         break;
                     default:
@@ -74,6 +89,19 @@
                 }
             }
         });
+        
+    }
+
+    //Man KVO
+    if ([keyPath isEqualToString:@"name"]){
+        NSUInteger idx = [_dataSource.people indexOfObject:object];
+        id name = [change objectForKey:NSKeyValueChangeNewKey];
+        if (idx != NSNotFound && self.delegate){
+            dispatch_async(dispatch_get_main_queue(), ^{
+                _people[idx] = name;
+                [self.delegate viewModel:self didReplaceObjectsAtIndexes:[NSIndexSet indexSetWithIndex:idx]];
+            });
+        }
         
     }
     

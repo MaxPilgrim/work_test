@@ -108,7 +108,7 @@
 }
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     TableViewCell * cell = [_tableView dequeueReusableCellWithIdentifier:CELL_IDENTIFIER];
-    [cell configureCellWithMan:[_viewModel.people objectAtIndex:indexPath.row]];
+    [cell configureCellWithName:_viewModel.people[indexPath.row]];
     return cell;
 }
 #pragma mark - <UITableViewDelegate>
