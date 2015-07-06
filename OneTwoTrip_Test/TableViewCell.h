@@ -7,7 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "Man.h"
+
+@class Man;
+
 @interface TableViewCell : UITableViewCell
 
 -(void) configureCellWithMan:(Man *)man;

@@ -9,6 +9,7 @@
 
 
 #import "TableViewCell.h"
+#import "Man.h"
 
 @interface TableViewCell(){
     UIActivityIndicatorView * preloader;

@@ -7,9 +7,10 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "DataSource.h"
+
 
 @protocol ViewModelDelegate;
+@protocol DataSource;
 
 @interface ViewModel : NSObject
 

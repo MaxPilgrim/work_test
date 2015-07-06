@@ -7,6 +7,7 @@
 //
 
 #import "ViewModel.h"
+#import "DataSource.h"
 
 @interface ViewModel (){
     BOOL _active;

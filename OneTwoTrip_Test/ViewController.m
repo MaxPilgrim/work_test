@@ -11,6 +11,7 @@
 #import "ViewController.h"
 #import "ViewModel.h"
 #import "TableViewCell.h"
+#import "DataSource.h"
 
 @interface ViewController () <UITableViewDataSource, UITableViewDelegate, ViewModelDelegate>{
     UITableView * _tableView;
