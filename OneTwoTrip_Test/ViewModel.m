@@ -7,7 +7,6 @@
 //
 
 #import "ViewModel.h"
-#import <UIKit/UIKit.h>
 
 @interface ViewModel (){
     BOOL _active;
@@ -20,7 +19,7 @@
 @implementation ViewModel
 
 
--(instancetype)initWithDataSource:(DataSource *)dataSource{
+-(instancetype)initWithDataSource:(id<DataSource>)dataSource{
     self = [super init];
     if (self){
         _people = [NSMutableArray new];
@@ -48,48 +47,35 @@
 -(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context{
     if ([keyPath isEqualToString:@"people"]){
         dispatch_async(dispatch_get_main_queue(), ^{
-            NSArray * newObjects = [change objectForKey:NSKeyValueChangeNewKey];
-            NSIndexSet * indexes = [change objectForKey:NSKeyValueChangeIndexesKey];
+            if (self.delegate){
+                NSArray * newObjects = [change objectForKey:NSKeyValueChangeNewKey];
+                NSIndexSet * indexes = [change objectForKey:NSKeyValueChangeIndexesKey];
 
-            switch ([[change objectForKey:NSKeyValueChangeKindKey] unsignedIntegerValue]) {
-                case NSKeyValueChangeSetting:
-                    NSLog(@"setting");
-                    _people = [NSMutableArray arrayWithArray:newObjects];
-                    if (self.delegate) {
-                        [self.delegate didSetData];
-                    }
-                    break;
-                case NSKeyValueChangeInsertion:
-                    NSLog(@"insertion");
-                    [_people insertObjects:newObjects atIndexes:indexes];
-                    if (self.delegate) {
-                        [self.delegate didInsertedObjectsAtIndexes:indexes];
-                    }
-                    break;
-                case NSKeyValueChangeRemoval:
-                    NSLog(@"removal");
-                    [_people removeObjectsAtIndexes:indexes];
-                    if (self.delegate) {
-                        [self.delegate didRemovedObjectsAtIndexes:indexes];
-                    }
-
-                    break;
-                case NSKeyValueChangeReplacement:
-                    NSLog(@"replacement");
-                    [_people replaceObjectsAtIndexes:indexes withObjects:newObjects];
-                    if (self.delegate) {
-                        [self.delegate didReplacedObjectsAtIndexes:indexes];
-                    }
-
-                    break;
-
-                default:
-                    break;
+                switch ([[change objectForKey:NSKeyValueChangeKindKey] unsignedIntegerValue]) {
+                    case NSKeyValueChangeSetting:
+                        _people = [NSMutableArray arrayWithArray:newObjects];
+                        [self.delegate viewModelDidSetData:self];
+                        break;
+                    case NSKeyValueChangeInsertion:
+                        [_people insertObjects:newObjects atIndexes:indexes];
+                        [self.delegate viewModel:self didInsertObjectsAtIndexes:indexes];
+                        break;
+                    case NSKeyValueChangeRemoval:
+                        [_people removeObjectsAtIndexes:indexes];
+                        [self.delegate viewModel:self didRemoveObjectsAtIndexes:indexes];
+                        break;
+                    case NSKeyValueChangeReplacement:
+                        [_people replaceObjectsAtIndexes:indexes withObjects:newObjects];
+                        [self.delegate viewModel:self didReplaceObjectsAtIndexes:indexes];
+                        break;
+                    default:
+                        break;
+                }
             }
         });
-
+        
     }
-
+    
 }
 
 

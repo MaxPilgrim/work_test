@@ -6,18 +6,17 @@
 //  Copyright (c) 2015 kotovmd. All rights reserved.
 //
 
-#define CELL_IDENTIFIER @"cell_identifier"
+#define CELL_IDENTIFIER @"cell_identifier_onetwotrip"
 
 #import "ViewController.h"
 #import "ViewModel.h"
 #import "TableViewCell.h"
 
 @interface ViewController () <UITableViewDataSource, UITableViewDelegate, ViewModelDelegate>{
-    UITableView * tableView;
+    UITableView * _tableView;
     UIView *header;
     UIActivityIndicatorView * preloader;
     ViewModel * _viewModel;
-    NSLock * _lockDataSource;
 }
 
 @end
@@ -40,11 +39,6 @@
 
 }
 
--(void)viewWillAppear:(BOOL)animated{
-    [super viewWillAppear:animated];
-    [self configurePreloader];
-}
-
 
 -(void)configureViews{
     //self.view
@@ -52,52 +46,18 @@
 
     //tableView
 
-    tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
-    tableView.backgroundColor = [UIColor clearColor];
-    tableView.dataSource = self;
-    tableView.delegate = self;
+    _tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
+    _tableView.backgroundColor = [UIColor clearColor];
+    _tableView.dataSource = self;
+    _tableView.delegate = self;
+    [_tableView registerClass:[TableViewCell class] forCellReuseIdentifier:CELL_IDENTIFIER];
+    [self.view addSubview:_tableView];
 
-    [tableView registerClass:[TableViewCell class] forCellReuseIdentifier:CELL_IDENTIFIER];
 
-    [self.view addSubview:tableView];
-    //active button will be in header
-    [self configureTableHeader];
+    [self configureHeader];
 
 }
-
--(void)configurePreloader{
-    if (_viewModel.active){
-        preloader.hidden = NO;
-        [preloader startAnimating];
-    }else{
-        [preloader stopAnimating];
-        preloader.hidden = YES;
-    }
-}
-
-#pragma mark - <UITableViewDataSource>
--(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
-    return 1;
-}
-
--(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    return _viewModel.people ? _viewModel.people.count : 0;
-}
--(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
-    TableViewCell * cell = [tableView dequeueReusableCellWithIdentifier:CELL_IDENTIFIER];
-    [cell configureCellWithMan:[_viewModel.people objectAtIndex:indexPath.row]];
-    return cell;
-}
-#pragma mark - <UITableViewDelegate>
--(CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath{
-    return 44;
-}
--(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
-    return 44;
-}
-
-#pragma mark - Active Button
--(void)configureTableHeader{
+-(void)configureHeader{
     header = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 60)];
     header.backgroundColor = [UIColor whiteColor];
 
@@ -124,8 +84,38 @@
 
 
     [self.view addSubview:header];
-    tableView.frame = CGRectMake(0, header.frame.size.height, tableView.frame.size.width, tableView.frame.size.height - header.frame.size.height);
+    _tableView.frame = CGRectMake(0, header.frame.size.height, _tableView.frame.size.width, _tableView.frame.size.height - header.frame.size.height);
 }
+
+-(void)configurePreloader{
+    if (_viewModel.active){
+        preloader.hidden = NO;
+        [preloader startAnimating];
+    }else{
+        [preloader stopAnimating];
+        preloader.hidden = YES;
+    }
+}
+
+#pragma mark - <UITableViewDataSource>
+-(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
+    return 1;
+}
+
+-(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+    return _viewModel.people ? _viewModel.people.count : 0;
+}
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+    TableViewCell * cell = [_tableView dequeueReusableCellWithIdentifier:CELL_IDENTIFIER];
+    [cell configureCellWithMan:[_viewModel.people objectAtIndex:indexPath.row]];
+    return cell;
+}
+#pragma mark - <UITableViewDelegate>
+-(CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath{
+    return 44;
+}
+
+#pragma mark - Active Button
 -(void)activeButtonTapped{
     _viewModel.active = !_viewModel.active;
     [self configurePreloader];
@@ -134,20 +124,20 @@
 
 
 #pragma mark - <ViewModelDelegate>
--(void)didSetData{
-    [tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationTop];
+-(void)viewModelDidSetData:(ViewModel *)viewModel{
+    [_tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationTop];
 }
--(void)didInsertedObjectsAtIndexes:(NSIndexSet *)indexes{
+-(void)viewModel:(ViewModel *)viewModel didInsertObjectsAtIndexes:(NSIndexSet *)indexes{
     NSArray * indexPaths = [self getIndexPathsFromIndexSet:indexes];
-    [tableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationTop];
+    [_tableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationTop];
 }
--(void)didRemovedObjectsAtIndexes:(NSIndexSet *)indexes{
+-(void)viewModel:(ViewModel *)viewModel didRemoveObjectsAtIndexes:(NSIndexSet *)indexes{
     NSArray * indexPaths = [self getIndexPathsFromIndexSet:indexes];
-    [tableView deleteRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationTop];
+    [_tableView deleteRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationTop];
 }
--(void)didReplacedObjectsAtIndexes:(NSIndexSet *)indexes{
+-(void)viewModel:(ViewModel *)viewModel didReplaceObjectsAtIndexes:(NSIndexSet *)indexes{
     NSArray * indexPaths = [self getIndexPathsFromIndexSet:indexes];
-    [tableView reloadRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationTop];
+    [_tableView reloadRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationTop];
 }
 
 

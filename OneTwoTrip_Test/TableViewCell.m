@@ -67,14 +67,13 @@
 #pragma mark - Man KVO
 -(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context{
     dispatch_async(dispatch_get_main_queue(), ^{
-
         if ([keyPath isEqualToString:@"man.name"]){
-            NSLog(@"change = %@",change);
             id name = [change objectForKey:NSKeyValueChangeNewKey];
             if ([name isKindOfClass:[NSNull class]]) name = nil;
             [self configurePreloaderWithName:name];
 
         }
+
     });
 }
 

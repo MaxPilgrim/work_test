@@ -9,24 +9,28 @@
 #import <Foundation/Foundation.h>
 #import "DataSource.h"
 
+@protocol ViewModelDelegate;
+
+@interface ViewModel : NSObject
+
+@property (nonatomic) BOOL active;
+@property (nonatomic, strong, readonly) NSArray *people;
+@property (nonatomic, weak) id<ViewModelDelegate> delegate;
+
+
+-(instancetype)initWithDataSource:(id<DataSource>)dataSource;
+
+@end
+
 @protocol ViewModelDelegate <NSObject>
 
 @required
--(void)didSetData;
--(void)didInsertedObjectsAtIndexes:(NSIndexSet *)indexes;
--(void)didRemovedObjectsAtIndexes:(NSIndexSet *)indexes;
--(void)didReplacedObjectsAtIndexes:(NSIndexSet *)indexes;
+-(void)viewModelDidSetData:(ViewModel *)viewModel;
+-(void)viewModel:(ViewModel *)viewModel didInsertObjectsAtIndexes:(NSIndexSet *)indexes;
+-(void)viewModel:(ViewModel *)viewModel didRemoveObjectsAtIndexes:(NSIndexSet *)indexes;
+-(void)viewModel:(ViewModel *)viewModel didReplaceObjectsAtIndexes:(NSIndexSet *)indexes;
 
 @end
 
 
-@interface ViewModel : NSObject <DataSource>
 
-@property (nonatomic, assign) BOOL active;
-@property (nonatomic, strong, readonly) NSArray *people; // array of Man objects, KVO-compatible
-@property (nonatomic, assign) id<ViewModelDelegate> delegate;
-
-
--(instancetype)initWithDataSource:(DataSource *)dataSource;
-
-@end

@@ -31,30 +31,16 @@
 
 #pragma mark - _people KVC
 
--(void) insertObject:(Man *)object inPeopleAtIndex:(NSUInteger)index{
-    [_people insertObject:object atIndex:index];
-}
-
 -(void)insertPeople:(NSArray *)array atIndexes:(NSIndexSet *)indexes{
     [_people insertObjects:array atIndexes:indexes];
 }
 
--(void)removeObjectFromPeopleAtIndex:(NSUInteger)index{
-    [_people removeObjectAtIndex:index];
-}
 -(void)removePeopleAtIndexes:(NSIndexSet *)indexes{
     [_people removeObjectsAtIndexes:indexes];
 }
 
--(void)replaceObjectInPeopleAtIndex:(NSUInteger)index withObject:(id)object{
-    [_people replaceObjectAtIndex:index withObject:object];
-}
 -(void)replacePeopleAtIndexes:(NSIndexSet *)indexes withPeople:(NSArray *)array{
     [_people replaceObjectsAtIndexes:indexes withObjects:array];
-}
-
--(NSArray * )people{
-    return _people;
 }
 
 -(void)setPeople:(NSArray *)people{
@@ -74,6 +60,23 @@
 }
 
 #pragma mark - updates methods
+
+-(void)startUpdates{
+    [self nextUpdate];
+}
+
+-(void)nextUpdate{
+    if (self.active){
+        double delay = (arc4random() % 10) / 10.0 + 1;
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), QUEQUES_MANAGER.serialQueue, ^{
+            [self performUpdate];
+            dispatch_async(QUEQUES_MANAGER.serialQueue, ^{
+                [self nextUpdate];
+            });
+
+        });
+    }
+}
 
 -(void)performUpdate{
     if (!self.active) return;
@@ -99,21 +102,6 @@
     }
 }
 
--(void)nextUpdate{
-    if (self.active){
-        double delay = (arc4random() % 10) / 10.0 + 1;
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), QUEQUES_MANAGER.serialQueue, ^{
-            [self performUpdate];
-            dispatch_async(QUEQUES_MANAGER.serialQueue, ^{
-                [self nextUpdate];
-            });
-            
-        });
-    }
-}
--(void)startUpdates{
-    [self nextUpdate];
-}
 
 
 -(void)performPeopleSetting{
@@ -123,31 +111,20 @@
         Man * man = [Man new];
         [newObjects addObject:man];
     }
-//    NSLog(@"Data source setting");
     [self setPeople:newObjects];
 }
 -(void)performPeopleInsert{
     int size = arc4random() % 20 + 4;
-    if (size == 1){
-        int idx = arc4random() % (_people.count + 1);
-        Man * man = [Man new];
-        [self insertObject:man inPeopleAtIndex:idx];
-        return;
-    }
-
     NSMutableIndexSet * indexes = [NSMutableIndexSet new];
     for (int i = 0; i < size; i++){
         int idx = arc4random() % (_people.count + [indexes count] + 1);
         [indexes addIndex:idx];
     }
-//    NSLog(@"new insertion");
     NSMutableArray * newObjects = [NSMutableArray new];
     [indexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
-//        NSLog(@"idx = %d",idx);
         Man * man = [Man new];
         [newObjects addObject:man];
     }];
-
     [self insertPeople:newObjects atIndexes:indexes];
 }
 -(void)performPeopleRemoval{
@@ -159,7 +136,6 @@
         [indexes addIndex:idx];
     }
     [self removePeopleAtIndexes:indexes];
-
 }
 -(void)performPeopleReplacement{
     int size = arc4random() % 20 + 1;
@@ -174,9 +150,7 @@
         Man * man = [Man new];
         [newObjects addObject:man];
     }];
-
     [self replacePeopleAtIndexes:indexes withPeople:newObjects];
-
 }
 
 
