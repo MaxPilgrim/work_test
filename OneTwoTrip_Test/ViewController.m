@@ -36,7 +36,6 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view, typically from a nib.
     [self configureViews];
 
 }
@@ -44,14 +43,6 @@
 -(void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
     [self configurePreloader];
-}
--(void)viewWillDisappear:(BOOL)animated{
-    [super viewWillDisappear:animated];
-}
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 
 
@@ -146,14 +137,26 @@
 -(void)didSetData{
     [tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationTop];
 }
--(void)didInsertedObjectsAtIndexPaths:(NSArray *)indexPaths{
+-(void)didInsertedObjectsAtIndexes:(NSIndexSet *)indexes{
+    NSArray * indexPaths = [self getIndexPathsFromIndexSet:indexes];
     [tableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationTop];
 }
--(void)didRemovedObjectsAtIndexPaths:(NSArray *)indexPaths{
+-(void)didRemovedObjectsAtIndexes:(NSIndexSet *)indexes{
+    NSArray * indexPaths = [self getIndexPathsFromIndexSet:indexes];
     [tableView deleteRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationTop];
 }
--(void)didReplacedObjectsAtIndexPaths:(NSArray *)indexPaths{
+-(void)didReplacedObjectsAtIndexes:(NSIndexSet *)indexes{
+    NSArray * indexPaths = [self getIndexPathsFromIndexSet:indexes];
     [tableView reloadRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationTop];
+}
+
+
+-(NSArray *) getIndexPathsFromIndexSet:(NSIndexSet *) set{
+    NSMutableArray * indexPaths = [NSMutableArray new];
+    [set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+        [indexPaths addObject:[NSIndexPath indexPathForRow:idx inSection:0]];
+    }];
+    return indexPaths;
 }
 
 

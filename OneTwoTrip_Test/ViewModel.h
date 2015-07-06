@@ -13,9 +13,9 @@
 
 @required
 -(void)didSetData;
--(void)didInsertedObjectsAtIndexPaths:(NSArray *)indexPaths;
--(void)didRemovedObjectsAtIndexPaths:(NSArray *)indexPaths;
--(void)didReplacedObjectsAtIndexPaths:(NSArray *)indexPaths;
+-(void)didInsertedObjectsAtIndexes:(NSIndexSet *)indexes;
+-(void)didRemovedObjectsAtIndexes:(NSIndexSet *)indexes;
+-(void)didReplacedObjectsAtIndexes:(NSIndexSet *)indexes;
 
 @end
 
